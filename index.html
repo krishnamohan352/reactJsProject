@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Todo</title>
+    <style>
+        body {
+            background: #5b6485;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            outline: none;
+            font-size: 14px;
+        }
+
+        #list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        li {
+            background: #f9fafc;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+        }
+
+        span { flex: 1; }
+
+        button {
+            border: none;
+            margin-left: 6px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <h2>Todo App</h2>
+
+        <input id="input" placeholder="Add todo..." />
+        <br><br>
+
+        <input id="search" placeholder="Search..." />
+        <select id="filter">
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="done">Done</option>
+        </select>
+        <select id="sort">
+            <option value="new">Newest</option>
+            <option value="old">Oldest</option>
+        </select>
+
+        <ul id="list"></ul>
+    </div>
+    <script>
+        let editId = null;
+        let todos = JSON.parse(localStorage.getItem("todos") || "[]");
+
+        const input = document.getElementById("input");
+        const search = document.getElementById("search");
+        const sort = document.getElementById("sort");
+        const list = document.getElementById("list");
+        const filter = document.getElementById("filter");
+
+        function debounce(fn, delay) {
+            let t;
+            return (...args) => {
+                clearTimeout(t);
+                t = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        function save() {
+            localStorage.setItem("todos", JSON.stringify(todos));
+        }
+
+        input.onkeydown = (e) => {
+            if (e.key === "Enter" && input.value.trim()) {
+
+                if (editId) {
+                    todos = todos.map(t =>
+                        t.id === editId ? { ...t, text: input.value.trim() } : t
+                    );
+                    editId = null;
+                } else {
+                    todos.push({
+                        id: Date.now(),
+                        text: input.value.trim(),
+                        created: Date.now(),
+                        done: false
+                    });
+                }
+
+                input.value = "";
+                save();
+                render();
+            }
+        };
+
+        function del(id) {
+            todos = todos.filter(t => t.id !== id);
+            save();
+            render();
+        }
+
+        function render() {
+            let data = [...todos];
+
+            const term = search.value.toLowerCase();
+            if (term) {
+                data = data.filter(t => t.text.toLowerCase().includes(term));
+            }
+            console.log(filter.value);
+            if (filter.value === "active") {
+                data = data.filter(t => !t.done);
+            }
+            else if (filter.value === "done") {
+                data = data.filter(t => t.done);
+            }
+
+            if (sort.value === "old") {
+                data.sort((a, b) => a.created - b.created);
+            } else {
+                data.sort((a, b) => b.created - a.created);
+            }
+
+            list.innerHTML = data.map(t => `
+            <li>
+            <span style="text-decoration:${t.done ? 'line-through' : ''}">
+                ${t.text}
+                </span>
+
+                <button onclick="toggleDone(${t.id})">
+                ${t.done ? "↩️" : "✔️"}
+                </button>
+            <button onclick="startEdit(${t.id})">✏️</button>
+            <button onclick="del(${t.id})">❌</button>
+            </li>
+        `).join("");
+        }
+
+        search.addEventListener("input", debounce(render, 300));
+        sort.addEventListener("change", render);
+        filter.addEventListener("change", render);
+
+        function startEdit(id) {
+            const todo = todos.find(t => t.id === id);
+
+            input.value = todo.text;
+            editId = id;
+        }
+
+        function toggleDone(id) {
+            todos = todos.map(t =>
+                t.id === id ? { ...t, done: !t.done } : t
+            );
+
+            save();
+            render();
+        }
+        render();
+    </script>
+</body>
+</html>
