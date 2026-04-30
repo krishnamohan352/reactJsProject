@@ -1,6 +1,7 @@
 import React from 'react'
 
 const Orders = () => {
+    const orders = (JSON.parse(localStorage.getItem("orders")) || []).reverse();
     return (
         <section className="max-w-5xl mx-auto p-6">
 
@@ -9,34 +10,42 @@ const Orders = () => {
             </h2>
 
             <div className="space-y-6">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+                {orders.length === 0 ? (
+                    <p className="text-gray-500">No orders yet</p>
+                ) : (
+                    orders.map((order) => (
+                        <div key={order.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
 
-                    <div class="flex justify-between mb-2">
-                        <span class="font-semibold text-gray-800 dark:text-white">
-                            Order #1001
-                        </span>
-                        <span class="text-sm text-gray-500">
-                            12-2-2001
-                        </span>
-                    </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold text-gray-800 dark:text-white">
+                                    Order #{order.id}
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                    {order.date}
+                                </span>
+                            </div>
 
-                    <div class="space-y-1 mb-3">
-                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-                            <span>name x 1</span>
-                            <span>200</span>
+                            <div className="space-y-1 mb-3">
+                                {order.items.map((item) => (
+                                    <div key={item.id} className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
+                                        <span>{item.title} x {item.quantity}</span>
+                                        <span>₹ {(item.price * item.quantity).toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex justify-between border-t pt-2">
+                                <span className="font-semibold text-gray-800 dark:text-white">Total</span>
+                                <span className="text-blue-500 font-bold"> ₹ {order.total}</span>
+                            </div>
+
                         </div>
-                    </div>
+                    ))
 
-                    <div class="flex justify-between border-t pt-2">
-                        <span class="font-semibold text-gray-800 dark:text-white">Total</span>
-                        <span class="text-blue-500 font-bold">300</span>
-                    </div>
-
-                </div>
-                
+                )}
             </div>
 
-        </section>
+        </section >
     )
 }
 

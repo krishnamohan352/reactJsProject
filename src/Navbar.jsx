@@ -15,9 +15,11 @@ export default function Navbar() {
     <header className="bg-white dark:bg-gray-800 shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
-        <h1 className="text-xl font-bold text-gray-800 dark:text-white">
-          MyShop
-        </h1>
+        <Link to='/'>
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+            K-Shop
+          </h1>
+        </Link>
 
         <nav className="hidden md:flex space-x-6">
           <Link to='/' className="text-gray-600 dark:text-gray-300 hover:text-blue-500">Home</Link>

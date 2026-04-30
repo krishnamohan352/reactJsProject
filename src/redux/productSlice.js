@@ -1,14 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export const fetchProducts = createAsyncThunk('products', async () => {
-    const response = await fetch('https://dummyjson.com/products');
+export const fetchProducts = createAsyncThunk('products', async (page) => {
+    await new Promise((res) => setTimeout(res, 1000));
+    // const response = await fetch('https://dummyjson.com/products');
+
+    const limit = 12;
+    const skip = (page - 1) * limit;
+    const response = await fetch(`https://dummyjson.com/products?limit=${limit}&skip=${skip}`);
+
+
     const jsonResponse = await response.json();
     return jsonResponse.products;
 })
 
 const initialState = {
     items: [],
-    state: undefined,
+    status: null,
     error: null
 }
 
@@ -16,10 +23,19 @@ const productsSlice = createSlice({
     name: 'productSlice',
     initialState,
     extraReducers: (builder) => {
-        builder.addCase(fetchProducts.fulfilled, (state, action) => {
-            state.status = 'succeeded',
-                state.items = action.payload
-        })
+        builder
+            .addCase(fetchProducts.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(fetchProducts.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                // state.items = action.payload;
+                state.items = [...state.items, ...action.payload]
+            })
+            .addCase(fetchProducts.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.error.message;
+            });
     }
 })
 

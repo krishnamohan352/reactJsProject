@@ -7,12 +7,20 @@ import CartDetail from './CartDetail';
 import Checkout from './Checkout';
 import Orders from './Orders';
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from "react-hot-toast";
 
 function App() {
 
 
   return (
     <>
+      <Toaster position="top-center" toastOptions={{
+        duration: 2000,
+        style: {
+          background: "#333",
+          color: "#fff",
+        },
+      }} />
       <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
         <Navbar />
         <Routes>

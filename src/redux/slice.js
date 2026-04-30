@@ -9,16 +9,11 @@ const addToCart = createSlice({
     initialState,
     reducers: {
         addItem: (state, action) => {
-            // state.value += 1;
-            // console.log(action);
             // state.items.push(action.payload)
             // localStorage.setItem('cart', JSON.stringify(state.items))
-
-
             const existingItem = state.items.find(
                 item => item.id === action.payload.id
             );
-
 
             if (existingItem) {
                 existingItem.quantity += 1;
@@ -27,13 +22,10 @@ const addToCart = createSlice({
             } else {
                 state.items.push({ ...action.payload, quantity: 1 });
             }
-
             localStorage.setItem('cart', JSON.stringify(state.items));
             // localStorage.setItem('cart', JSON.stringify([...state.items]));
-
         },
         removeItem: (state, action) => {
-            // state.value > 0 ? state.value -= 1 : null;
             // const cartData = state.items.filter(item => item.id != action.payload.id);
             // state.items = cartData;
             // localStorage.setItem('cart', JSON.stringify(cartData));
@@ -50,21 +42,21 @@ const addToCart = createSlice({
                     );
                 }
             }
-
             localStorage.setItem('cart', JSON.stringify(state.items));
-
         },
         deleteItem: (state, action) => {
-            // state.items = [];
-            // localStorage.removeItem('cart');
             state.items = state.items.filter(
                 item => item.id !== action.payload.id
             );
 
             localStorage.setItem('cart', JSON.stringify(state.items));
+        },
+        clearCart: (state) => {
+            state.items = [];
+            localStorage.removeItem('cart');
         }
     }
 })
 
-export const { addItem, removeItem, deleteItem } = addToCart.actions;
+export const { addItem, removeItem, deleteItem, clearCart } = addToCart.actions;
 export default addToCart.reducer;
