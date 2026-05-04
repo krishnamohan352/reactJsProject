@@ -1,6 +1,8 @@
 import { useSelector } from "react-redux";
 import { useTheme } from "./context/ThemeContext";
 import { Link } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import { ShoppingCart, Moon, Sun } from "lucide-react";
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -9,10 +11,10 @@ export default function Navbar() {
     (total, item) => total + item.quantity,
     0
   );
+  const { isLoggedIn, user, logout } = useAuth();
 
   return (
-
-    <header className="bg-white dark:bg-gray-800 shadow-md">
+    <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
         <Link to='/'>
@@ -22,7 +24,6 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden md:flex space-x-6">
-          <Link to='/' className="text-gray-600 dark:text-gray-300 hover:text-blue-500">Home</Link>
           <Link to='/orders' className="text-gray-600 dark:text-gray-300 hover:text-blue-500">Order</Link>
         </nav>
 
@@ -30,13 +31,17 @@ export default function Navbar() {
 
           <button onClick={toggleTheme}
             className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">
-            🌙
+            {theme === "dark" ? (
+              <Sun size={20} className="text-yellow-400" />
+            ) : (
+              <Moon size={20} className="text-gray-800" />
+            )}
           </button>
 
           <div className="relative">
 
             <Link to='/cart' ><button className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
-              🛒
+              <ShoppingCart size={20} className="text-gray-800 dark:text-white" />
             </button></Link>
             <span
               className="cart-count absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -44,20 +49,31 @@ export default function Navbar() {
             </span>
           </div>
 
-          <span className="text-gray-700 dark:text-gray-200 font-medium hidden"></span>
+          {isLoggedIn && user?.name && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg">
+              <span className="text-gray-800 dark:text-gray-200 font-medium">
+                {user.name}
+              </span>
+            </div>
+          )}
 
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Login
-          </button>
+          {isLoggedIn ? (
 
-          <button
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-            Logout
-          </button>
-
+            <button
+              onClick={logout}
+              className="px-4 py-2 bg-red-500 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-red-600"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/login">
+              <button className="px-4 py-2 bg-blue-500 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-blue-600">
+                Login
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
-
   );
 }

@@ -8,6 +8,12 @@ import Checkout from './Checkout';
 import Orders from './Orders';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from "react-hot-toast";
+import MainLayout from "./MainLayout";
+import AuthLayout from "./AuthLayout";
+import ProtectedRoute from './components/ProtectedRoute';
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "./components/ErrorFallback";
+import NotFound from './NotFound';
 
 function App() {
 
@@ -22,15 +28,38 @@ function App() {
         },
       }} />
       <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
-        <Navbar />
-        <Routes>
-          <Route path='/' element={<Product />}></Route>
-          <Route path='/cart' element={<CartDetail />}></Route>
-          <Route path='/orders' element={<Orders />}></Route>
-        </Routes>
-        {/* <Checkout/> */}
-        {/* <Login /> */}
-      </div>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Routes>
+
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Product />} />
+              <Route path="/cart" element={<CartDetail />} />
+            </Route>
+
+            <Route element={<ProtectedRoute />}>
+              <Route element={<MainLayout />}>
+                <Route path="checkout" element={<Checkout />} />
+                <Route path="/orders" element={<Orders />} />
+              </Route>
+            </Route>
+
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Register />} />
+            </Route>
+
+            <Route
+              path="*"
+              element={
+                <div className="h-screen flex items-center justify-center text-red-500 text-xl">
+                  <NotFound/>
+                </div>
+              }
+            />
+
+          </Routes>
+        </ErrorBoundary>
+      </div >
     </>
   )
 }

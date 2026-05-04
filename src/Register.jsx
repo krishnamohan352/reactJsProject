@@ -1,84 +1,115 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import toast from "react-hot-toast";
 
-export default function Register() {
-  const [form, setForm] = useState({
+function Signup() {
+  const { isLoggedIn, signup } = useAuth();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/", { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match");
+    const { name, email, password } = formData;
+
+    if (!name || !email || !password) {
+      toast.error("All fields are required");
       return;
     }
 
-    console.log("Register data:", form);
+    const success = signup(formData);
+
+    if (success) {
+      toast.success("Signup successful!");
+
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
+
+      navigate("/", { replace: true });
+    }
   };
 
   return (
-    <div className="w-full max-w-md p-6 rounded-xl shadow-lg bg-white dark:bg-gray-900 transition-colors duration-300">
-      <h2 className="text-2xl font-bold text-center mb-6 text-black dark:text-white">
-        Register
-      </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md space-y-4"
+      >
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
+          Signup
+        </h2>
 
-        {/* Name */}
         <input
           type="text"
           name="name"
           placeholder="Full Name"
-          value={form.name}
+          value={formData.name}
           onChange={handleChange}
-          className="w-full p-3 border rounded bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-700 transition-colors duration-300"
+          className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Email */}
         <input
           type="email"
           name="email"
           placeholder="Email"
-          value={form.email}
+          value={formData.email}
           onChange={handleChange}
-          className="w-full p-3 border rounded bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-700 transition-colors duration-300"
+          className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Password */}
         <input
           type="password"
           name="password"
           placeholder="Password"
-          value={form.password}
+          value={formData.password}
           onChange={handleChange}
-          className="w-full p-3 border rounded bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-700 transition-colors duration-300"
+          className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Confirm Password */}
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          className="w-full p-3 border rounded bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-700 transition-colors duration-300"
-        />
-
-        {/* Button */}
         <button
           type="submit"
-          className="w-full py-3 rounded bg-blue-500 text-white hover:bg-blue-600 dark:bg-green-400 dark:text-black transition-colors duration-300"
+          className="w-full py-2 bg-blue-500 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-blue-600"
         >
-          Create Account
+          Signup
         </button>
+
+        <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-blue-500 hover:underline"
+          >
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );
 }
+
+export default Signup;

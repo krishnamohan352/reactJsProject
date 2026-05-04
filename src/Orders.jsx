@@ -36,7 +36,7 @@ const Orders = () => {
 
                             <div className="flex justify-between border-t pt-2">
                                 <span className="font-semibold text-gray-800 dark:text-white">Total</span>
-                                <span className="text-blue-500 font-bold"> ₹ {order.total}</span>
+                                <span className="text-gray-800 dark:text-gray-200 font-bold"> ₹ {order.total}</span>
                             </div>
 
                         </div>

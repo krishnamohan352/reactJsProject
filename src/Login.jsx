@@ -1,50 +1,84 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import toast from "react-hot-toast";
 
-export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+function Login() {
+  const { isLoggedIn, login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log({ email, password });
-    };
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/", { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-black">
-            <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-sm p-6 rounded-xl shadow-md bg-white dark:bg-gray-900"
-            >
-                <h2 className="text-2xl font-bold mb-6 text-center text-black dark:text-white">
-                    Login
-                </h2>
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-                {/* Email */}
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full mb-4 p-3 border rounded bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-700"
-                />
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-                {/* Password */}
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full mb-6 p-3 border rounded bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-700"
-                />
+    const success = login(email, password);
 
-                {/* Button */}
-                <button
-                    type="submit"
-                    className="w-full py-3 rounded bg-blue-500 text-white hover:bg-blue-600  dark:text-black"
-                >
-                    Login
-                </button>
-            </form>
-        </div>
-    );
+    if (success) {
+      toast.success("Login successful!");
+      navigate("/", { replace: true });
+    } else {
+      toast.error("Invalid credentials");
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md space-y-4"
+      >
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
+          Login
+        </h2>
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          type="submit"
+          className="w-full py-2 bg-blue-500 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-blue-600"
+        >
+          Login
+        </button>
+
+        <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            className="text-blue-500 hover:underline"
+          >
+            Signup
+          </Link>
+        </p>
+      </form>
+    </div>
+  );
 }
+
+export default Login;
