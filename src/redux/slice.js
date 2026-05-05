@@ -23,7 +23,6 @@ const addToCart = createSlice({
                 state.items.push({ ...action.payload, quantity: 1 });
             }
             localStorage.setItem('cart', JSON.stringify(state.items));
-            // localStorage.setItem('cart', JSON.stringify([...state.items]));
         },
         removeItem: (state, action) => {
             // const cartData = state.items.filter(item => item.id != action.payload.id);
